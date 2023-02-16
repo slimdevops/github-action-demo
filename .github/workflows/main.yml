@@ -1,0 +1,46 @@
+name: main
+
+on: 
+  push: 
+    branches:
+    - main
+    
+jobs: 
+  build: 
+    runs-on: ubuntu-latest
+    steps: 
+    - name: checkout
+      uses: actions/checkout@v3
+    - name: dockerbuild
+      shell: bash
+      run: docker build -t demo:latest . 
+    - name: tarball
+      shell: bash
+      run: docker save -o demo.tar
+    - name: upload
+      uses: actions/upload-artifact@v3
+      with: 
+        name: demo.tar
+        path: ./demo.tar
+  
+  slim: 
+    runs-on: ubuntu-latest
+    steps: 
+    - name: download-artifacts
+      uses: actions/download-artifacts@v3
+      with: 
+        name: demo.tar
+        path: ./demo.tar
+    - name: dockerload
+      shell: bash
+      run: docker load -i demo.tar
+    - name: getslim 
+      shell: bash
+      run: curl -sL https://raw.githubusercontent.com/slimtoolkit/slim/master/scripts/install-slim.sh | sudo -E bash -
+    - name: runslim
+      shell: bash
+      run: slim build demo:latest
+    - name: checkresults
+      shell: bash
+      run: docker images | grep slim 
+      
