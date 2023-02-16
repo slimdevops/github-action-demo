@@ -32,6 +32,12 @@ jobs:
       with: 
         name: demo.tar
         path: ./demo.tar
+    - name: debug
+      shell: bash
+      run: ls -la
+    - name: debug
+      shell: bash
+      run: ls -la demo.tar
     - name: dockerload
       shell: bash
       run: docker load -i demo.tar
